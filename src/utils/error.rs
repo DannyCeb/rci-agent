@@ -5,7 +5,7 @@ pub enum RciError {
     TestFailed,
     BuildFailed,
     CheckFailed,
-    SysActionFailed,
+    SysActionFailed(String),
     StdIO(std::io::Error),
     Unimplemented,
 }

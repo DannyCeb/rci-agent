@@ -3,7 +3,6 @@
 
         {
             "name": "task name",
-            "description": "task description",
             "language": "rust",
             "output": "acr",
             "source:": "github repository",
