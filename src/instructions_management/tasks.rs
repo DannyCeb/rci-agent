@@ -1,5 +1,3 @@
-use std::process::Command;
-
 use serde::{Deserialize, Serialize};
 
 use crate::utils::{error::RciError, shared_functions::run_command};

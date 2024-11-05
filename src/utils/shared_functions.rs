@@ -9,7 +9,7 @@ pub fn run_command(command: &str) -> Result<(), RciError> {
         Ok(())
     } else {
         Err(RciError::SysActionFailed(
-            String::from_utf8_lossy(&output.stderr).to_lowercase(),
+            String::from_utf8_lossy(&output.stderr).into_owned(),
         ))
     }
 }
