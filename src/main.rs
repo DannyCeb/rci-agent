@@ -9,7 +9,7 @@ fn main() -> Result<(), RciError> {
                     "name": "task name",
                     "language": "Rust",
                     "output": "ContainerRegistry",
-                    "source": "github repository",
+                    "source": "https://github.com/DannyCeb/calculadora_geometrica",
                     "steps": [
                         {"Check": null},
                         {"Test": null},

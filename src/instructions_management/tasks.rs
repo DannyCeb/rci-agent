@@ -1,5 +1,3 @@
-use std::process::Command;
-
 use serde::{Deserialize, Serialize};
 
 use crate::utils::{error::RciError, shared_functions::run_command};
@@ -21,11 +19,16 @@ pub struct Task {
 impl Task {
     pub fn execute(&self) -> Result<(), RciError> {
         // clone git repository
-        run_command(&format!("git clone {}", self.source))?;
+        run_command(&format!("git clone {}", &self.source), ".")?;
+
+        let dir = self.source.split("/").collect::<Vec<&str>>();
+
+        let dir = *dir.last().unwrap();
+        println!("[Info]: Git dir: {}", dir);
 
         // Execute every step
         for step in self.steps.iter() {
-            step.do_instruction(&self.language)?;
+            step.do_instruction(&self.language, Some(dir))?;
         }
         Ok(())
     }

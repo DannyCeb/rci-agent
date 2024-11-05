@@ -14,31 +14,36 @@ pub enum Instruction {
 }
 
 impl Instruction {
-    pub fn do_instruction(&self, lang: &ProgrammingLanguage) -> Result<(), RciError> {
+    pub fn do_instruction(
+        &self,
+        lang: &ProgrammingLanguage,
+        dir: Option<&str>,
+    ) -> Result<(), RciError> {
+        let dir = dir.unwrap_or(".");
         match self {
-            Self::SysAction(command) => Ok(run_command(command)?),
+            Self::SysAction(command) => Ok(run_command(command, dir)?),
             Self::Check => match lang {
-                ProgrammingLanguage::Rust => Ok(run_command("cargo check")?),
+                ProgrammingLanguage::Rust => Ok(run_command("cargo check", dir)?),
                 _ => {
                     eprintln!("Unsupported feature!");
                     Err(RciError::Unimplemented)
                 }
             },
             Self::Test => match lang {
-                ProgrammingLanguage::Rust => Ok(run_command("cargo test")?),
+                ProgrammingLanguage::Rust => Ok(run_command("cargo test", dir)?),
                 _ => {
                     eprintln!("Unsupported feature!");
                     Err(RciError::Unimplemented)
                 }
             },
             Self::Build => match lang {
-                ProgrammingLanguage::Rust => Ok(run_command("cargo build")?),
+                ProgrammingLanguage::Rust => Ok(run_command("cargo build", dir)?),
                 _ => {
                     eprintln!("Unsupported feature!");
                     Err(RciError::Unimplemented)
                 }
             },
-            _ => Err(RciError::Unimplemented),
+            _ => Ok(()),
         }
     }
 }
