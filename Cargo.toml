@@ -6,3 +6,9 @@ edition = "2021"
 [dependencies]
 serde = { version = "1.0.214", features = ["derive"] }
 serde_json = "1.0.132"
+azure_core = "0.21.0"
+azure_storage = "0.21.0"
+azure_storage_blobs = "0.21.0"
+
+tokio = { version = "1.41.0", features = ["full"] }
+env-file-reader = "0.3.0"
