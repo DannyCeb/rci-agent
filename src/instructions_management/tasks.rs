@@ -63,9 +63,15 @@ impl Task {
 
     pub async fn publish_to_azure(&self, blob_name: &str, blob_path: &str) -> Result<(), RciError> {
         let env_variables = read_file(".env")?;
-        let account = env_variables.get("storage_account").unwrap();
-        let access_key = env_variables.get("access_key").unwrap();
-        let container = env_variables.get("container").unwrap();
+        let account = env_variables
+            .get("storage_account")
+            .ok_or(RciError::EnvFileError)?;
+        let access_key = env_variables
+            .get("access_key")
+            .ok_or(RciError::EnvFileError)?;
+        let container = env_variables
+            .get("container")
+            .ok_or(RciError::EnvFileError)?;
 
         let storage_credentials =
             StorageCredentials::access_key(account.clone(), access_key.clone());

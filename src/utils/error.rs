@@ -10,6 +10,7 @@ pub enum RciError {
     Unimplemented,
     AzureStorageError(azure_storage::Error),
     RequiredData,
+    EnvFileError,
 }
 
 impl Display for RciError {
