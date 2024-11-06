@@ -8,6 +8,8 @@ pub enum RciError {
     SysActionFailed(String),
     StdIO(std::io::Error),
     Unimplemented,
+    AzureStorageError(azure_storage::Error),
+    RequiredData,
 }
 
 impl Display for RciError {
@@ -21,5 +23,11 @@ impl Error for RciError {}
 impl From<std::io::Error> for RciError {
     fn from(error: std::io::Error) -> Self {
         Self::StdIO(error)
+    }
+}
+
+impl From<azure_storage::Error> for RciError {
+    fn from(error: azure_storage::Error) -> Self {
+        Self::AzureStorageError(error)
     }
 }
