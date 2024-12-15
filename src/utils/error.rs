@@ -11,6 +11,7 @@ pub enum RciError {
     AzureStorageError(azure_storage::Error),
     RequiredData,
     EnvFileError,
+    ReqwestError(reqwest::Error),
 }
 
 impl Display for RciError {
@@ -30,5 +31,11 @@ impl From<std::io::Error> for RciError {
 impl From<azure_storage::Error> for RciError {
     fn from(error: azure_storage::Error) -> Self {
         Self::AzureStorageError(error)
+    }
+}
+
+impl From<reqwest::Error> for RciError {
+    fn from(error: reqwest::Error) -> Self {
+        Self::ReqwestError(error)
     }
 }
