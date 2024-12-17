@@ -1,27 +1,38 @@
-use std::{env, sync::Arc, time::Duration};
+use std::{collections::HashMap, env, sync::Arc, time::Duration};
 
 use rci_agent::{
-    background::auth::{self, auth},
+    background::{
+        auth::{self, auth},
+        get_tasks::get_tasks,
+    },
     instructions_management::tasks::TaskList,
-    utils::error::RciError,
+    utils::{
+        error::RciError,
+        stared_data::{SharedData, TaskWrapper},
+    },
 };
+use reqwest::Client;
 use serde_json::from_str;
 use tokio::{sync::Mutex, time::sleep};
 
 #[tokio::main]
 async fn main() -> Result<(), RciError> {
-    let token = Arc::new(Mutex::new(String::new()));
-    let token_clone = token.clone();
-    tokio::spawn(async move { auth(token_clone).await });
+    let client = Client::new();
+    let v_tasks: HashMap<String, TaskWrapper> = HashMap::new();
+    let token = String::new();
 
-    println!("Antes de dormir");
-    sleep(Duration::from_secs(2)).await;
+    let shared_data = Arc::new(Mutex::new(SharedData::new(v_tasks, token, client)));
 
-    println!("token: {}", *token.clone().lock().await);
+    let shared_data_clone = shared_data.clone();
+    tokio::spawn(auth(shared_data_clone));
+    while shared_data.lock().await.get_token_value_by_ref().is_empty() {
+        sleep(Duration::from_millis(10)).await;
+    }
+    println!("token: {:?}", *shared_data.lock().await);
 
-    sleep(Duration::from_secs(7)).await;
-
-    println!("token: {}", *token.clone().lock().await);
+    let shared_data_clone = shared_data.clone();
+    tokio::spawn(get_tasks(shared_data_clone));
+    sleep(Duration::from_secs(10)).await;
 
     /*
     let args: Vec<String> = env::args().collect();

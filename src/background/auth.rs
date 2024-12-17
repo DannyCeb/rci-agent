@@ -1,13 +1,12 @@
 use env_file_reader::read_file; // To read environment variables from a file
-use reqwest::Client; // HTTP client to make requests
 use serde::Deserialize; // To deserialize the JSON response
 use std::{collections::HashMap, sync::Arc, time::Duration}; // Standard libraries for collections, concurrency, and time
 use tokio::{sync::Mutex, time::sleep}; // Tokio libraries for concurrency and async sleeping
 
-use crate::utils::error::RciError; // Import the error type defined in the project
+use crate::utils::{error::RciError, stared_data::SharedData}; // Import the error type defined in the project
 
 // Asynchronous function to authenticate and get the access token
-pub async fn auth(token_wrapper: Arc<Mutex<String>>) -> Result<(), RciError> {
+pub async fn auth(shared_data: Arc<Mutex<SharedData>>) -> Result<(), RciError> {
     loop {
         // Read environment variables from the ".env" file
         let env_variables = read_file(".env").unwrap();
@@ -29,16 +28,20 @@ pub async fn auth(token_wrapper: Arc<Mutex<String>>) -> Result<(), RciError> {
         params.insert("client_secret", client_secret); // Client secret
         params.insert("scope", scope); // Scope of the request
 
-        // Create a new HTTP client
-        let client = Client::new();
-        // Make the POST request to get the token
-        let res = client.post(&url).form(&params).send().await?;
+        {
+            let mut guard = shared_data.lock().await;
+            // Create a new HTTP client
+            let client = guard.get_http_client_by_mut_ref();
+            // Make the POST request to get the token
+            let res = client.post(&url).form(&params).send().await?;
 
-        // Deserialize the response to get the access token
-        let token: TokenResponse = res.json().await?;
-        let token = token.access_token;
-        // Update the token value in the Mutex
-        *token_wrapper.lock().await = token;
+            // Deserialize the response to get the access token
+            let token: TokenResponse = res.json().await?;
+            let token = token.access_token;
+            // Update the token value in the Mutex
+
+            guard.set_token(token);
+        }
         // Wait 800 seconds before requesting the token again
         sleep(Duration::from_secs(800)).await;
     }
