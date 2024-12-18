@@ -4,10 +4,12 @@ use rci_agent::{
     background::{
         auth::{self, auth},
         get_tasks::get_tasks,
+        update_task::update_tasks_on_server,
     },
     instructions_management::tasks::TaskList,
     utils::{
         error::RciError,
+        shared_functions::create_work_dir,
         stared_data::{SharedData, TaskWrapper},
     },
 };
@@ -23,16 +25,14 @@ async fn main() -> Result<(), RciError> {
 
     let shared_data = Arc::new(Mutex::new(SharedData::new(v_tasks, token, client)));
 
-    let shared_data_clone = shared_data.clone();
-    tokio::spawn(auth(shared_data_clone));
+    tokio::spawn(auth(shared_data.clone()));
     while shared_data.lock().await.get_token_value_by_ref().is_empty() {
         sleep(Duration::from_millis(10)).await;
     }
-    println!("token: {:?}", *shared_data.lock().await);
+    tokio::spawn(get_tasks(shared_data.clone()));
+    tokio::spawn(update_tasks_on_server(shared_data.clone()));
 
-    let shared_data_clone = shared_data.clone();
-    tokio::spawn(get_tasks(shared_data_clone));
-    sleep(Duration::from_secs(10)).await;
+    sleep(Duration::from_secs(100)).await;
 
     /*
     let args: Vec<String> = env::args().collect();

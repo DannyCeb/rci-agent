@@ -31,7 +31,7 @@ pub async fn auth(shared_data: Arc<Mutex<SharedData>>) -> Result<(), RciError> {
         {
             let mut guard = shared_data.lock().await;
             // Create a new HTTP client
-            let client = guard.get_http_client_by_mut_ref();
+            let client = guard.get_http_client_by_ref();
             // Make the POST request to get the token
             let res = client.post(&url).form(&params).send().await?;
 

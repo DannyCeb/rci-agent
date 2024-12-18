@@ -17,3 +17,8 @@ pub fn run_command(command: &str, dir: &str) -> Result<(), RciError> {
         ))
     }
 }
+
+pub fn create_work_dir(directory_name: String) -> Result<(), RciError> {
+    run_command(&format!("mkdir {}", directory_name), ".")?;
+    Ok(())
+}

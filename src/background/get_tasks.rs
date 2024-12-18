@@ -1,7 +1,4 @@
-use std::{
-    sync::{Arc, MutexGuard},
-    time::Duration,
-};
+use std::{sync::Arc, time::Duration};
 
 use serde::{Deserialize, Serialize};
 use tokio::{sync::Mutex, time::sleep};
@@ -17,11 +14,12 @@ struct TasksRespose {
 }
 
 pub async fn get_tasks(shared_data: Arc<Mutex<SharedData>>) -> Result<(), RciError> {
+    sleep(Duration::from_secs(2)).await;
     loop {
         let tasks_received = {
-            let mut guard = shared_data.lock().await;
+            let guard = shared_data.lock().await;
             let token = guard.get_token_value_by_ref().clone();
-            let client = guard.get_http_client_by_mut_ref();
+            let client = guard.get_http_client_by_ref();
             let response = client
                 .get("https://rci.dannyrs.xyz/task/list_tasks")
                 .header("Authorization", token)
@@ -45,7 +43,8 @@ async fn insert_tasks(shared_data: Arc<Mutex<SharedData>>, tasks_received: Tasks
 
     for task in tasks {
         let id = task.id.clone();
-
-        shared_tasks.entry(id).or_insert(task);
+        if !task.is_done() {
+            shared_tasks.entry(id).or_insert(task);
+        }
     }
 }
