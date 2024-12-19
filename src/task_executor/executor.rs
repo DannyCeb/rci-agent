@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use tokio::sync::Mutex;
 
-use crate::utils::stared_data::SharedData;
+use crate::utils::stared_data::{SharedData, TaskStatus};
 
 pub async fn execute_task(task_id: String, shared_data: Arc<Mutex<SharedData>>) {
     let task = {
@@ -14,7 +14,9 @@ pub async fn execute_task(task_id: String, shared_data: Arc<Mutex<SharedData>>) 
     };
 
     match task {
-        Some(task_wrapper) => {}
+        Some(mut task_wrapper) => {
+            task_wrapper.set_status(TaskStatus::Active);
+        }
         None => {
             return;
         }

@@ -42,7 +42,7 @@ async fn insert_tasks(shared_data: Arc<Mutex<SharedData>>, tasks_received: Tasks
     let shared_tasks = guard.get_htasks_by_mut_ref();
 
     for task in tasks {
-        let id = task.id.clone();
+        let id = task.get_id_by_ref().clone();
         if !task.is_done() {
             shared_tasks.entry(id).or_insert(task);
         }
