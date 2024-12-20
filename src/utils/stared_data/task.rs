@@ -13,24 +13,28 @@ pub struct Task {
 }
 
 impl Task {
-    pub fn execute(&self) -> Result<TaskOutput, RciError> {
+    pub async fn execute(&self, workdir: &str) -> Result<TaskOutput, RciError> {
         for step in &self.steps {
             match step {
                 Step::Check => {
-                    println!("Compiling");
+                    self.lang.check(workdir)?;
                 }
                 Step::Test => {
-                    println!("Running");
+                    self.lang.test(workdir)?;
                 }
                 Step::Build => {
-                    println!("Building");
+                    self.lang.compile(workdir)?;
                 }
                 Step::Deploy => {
-                    println!("Deploying");
+                    let artifact_url = self.output.unwrap().deploy(workdir).await?;
+                    return Ok(TaskOutput::Result(format!(
+                        "Artifact url: {}",
+                        artifact_url
+                    )));
                 }
             }
         }
 
-        Ok(TaskOutput::Pending)
+        Ok(TaskOutput::Result("Task executed successfully".into()))
     }
 }

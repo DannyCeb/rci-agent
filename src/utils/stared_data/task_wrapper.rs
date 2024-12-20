@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::utils::{error::RciError, shared_functions::run_command};
+
 use super::{Task, TaskOutput, TaskStatus};
 
 #[derive(Serialize, Debug, Deserialize, Clone)]
@@ -36,5 +38,23 @@ impl TaskWrapper {
 
     pub fn set_output(&mut self, output: TaskOutput) {
         self.output = output;
+    }
+
+    pub async fn execute(&mut self) -> Result<(), RciError> {
+        let workdir = format!("/tmp/{}", self.id);
+        run_command(&format!("mkdir {}", workdir), "/")?;
+
+        run_command(&format!("git clone {}", &self.task.source), &workdir)?;
+
+        let dir_name = self.task.source.split("/").collect::<Vec<&str>>();
+
+        let dir_name = *dir_name.last().unwrap();
+
+        let workdir = format!("{}/{}", workdir, dir_name);
+
+        let result = self.task.execute(&workdir).await?;
+        self.set_output(result);
+        self.set_status(TaskStatus::Done);
+        Ok(())
     }
 }

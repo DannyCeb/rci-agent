@@ -52,11 +52,4 @@ impl SharedData {
     pub fn get_htasks_by_ref(&self) -> &HashMap<String, TaskWrapper> {
         &self.h_tasks
     }
-
-    pub fn get_task_clone_by_id(&self, id: &String) -> Option<TaskWrapper> {
-        match self.h_tasks.get(id) {
-            Some(task) => Some(task.clone()),
-            None => None,
-        }
-    }
 }

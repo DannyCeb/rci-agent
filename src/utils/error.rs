@@ -12,6 +12,7 @@ pub enum RciError {
     RequiredData,
     EnvFileError,
     ReqwestError(reqwest::Error),
+    MissingInformation(String),
 }
 
 impl Display for RciError {

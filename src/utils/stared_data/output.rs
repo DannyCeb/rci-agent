@@ -13,12 +13,14 @@ pub enum Output {
 }
 
 impl Output {
-    pub async fn deploy(&self, artifact_name: &str) -> Result<String, RciError> {
+    pub async fn deploy(&self, workdir: &str) -> Result<String, RciError> {
         match self {
             Output::StorageAccount => {
                 println!("Deploying Storage Account");
-                let blob_name = artifact_name;
-                let blob_path = &format!("{blob_name}/target/debug/{blob_name}");
+                let blob_name = workdir.split("/").collect::<Vec<&str>>();
+
+                let blob_name = blob_name.last().unwrap();
+                let blob_path = &format!("{workdir}/target/debug/{blob_name}");
 
                 Ok(self.publish_to_azure(blob_name, blob_path).await?)
             }

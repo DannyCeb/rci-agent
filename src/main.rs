@@ -1,20 +1,14 @@
-use std::{collections::HashMap, env, sync::Arc, time::Duration};
+use std::{collections::HashMap, sync::Arc, time::Duration};
 
 use rci_agent::{
-    background::{
-        auth::{self, auth},
-        get_tasks::get_tasks,
-        update_task::update_tasks_on_server,
-    },
-    instructions_management::tasks::TaskList,
+    background::{auth::auth, get_tasks::get_tasks, update_task::update_tasks_on_server},
+    task_executor::executor_background::executor_background,
     utils::{
         error::RciError,
-        shared_functions::create_work_dir,
         stared_data::{SharedData, TaskWrapper},
     },
 };
 use reqwest::Client;
-use serde_json::from_str;
 use tokio::{sync::Mutex, time::sleep};
 
 #[tokio::main]
@@ -31,6 +25,7 @@ async fn main() -> Result<(), RciError> {
     }
     tokio::spawn(get_tasks(shared_data.clone()));
     tokio::spawn(update_tasks_on_server(shared_data.clone()));
+    tokio::spawn(executor_background(shared_data.clone()));
 
     sleep(Duration::from_secs(100)).await;
 

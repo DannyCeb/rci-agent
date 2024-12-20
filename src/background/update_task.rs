@@ -20,7 +20,7 @@ pub async fn update_tasks_on_server(shared_data: Arc<Mutex<SharedData>>) -> Resu
     loop {
         let mut v_done_tasks_ids = Vec::<String>::new();
         {
-            let guard = shared_data.lock().await;
+            let mut guard = shared_data.lock().await;
 
             let h_tasks = guard.get_htasks_by_ref();
             if !h_tasks.is_empty() {
@@ -43,18 +43,22 @@ pub async fn update_tasks_on_server(shared_data: Arc<Mutex<SharedData>>) -> Resu
                     } else {
                         continue;
                     };
-                    println!("before request");
-                    let response = client
+
+                    let _ = client
                         .post("https://rci.dannyrs.xyz/task/update")
                         .header("Authorization", token.clone())
                         .json(&task)
                         .send()
                         .await?;
-
-                    println!("DEBUG RESPONSE {:?}", response);
                 }
             }
+
+            for task_id in v_done_tasks_ids {
+                println!("borrando: {}", task_id);
+                guard.get_htasks_by_mut_ref().remove(&task_id);
+            }
         }
+
         sleep(Duration::from_secs(10)).await;
     }
 }
