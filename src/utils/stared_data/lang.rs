@@ -7,6 +7,32 @@ pub enum Lang {
     Csharp,
 }
 
+/// Represents a programming language and provides methods to compile, test, and check code.
+///
+/// # Methods
+///
+/// * `compile(&self, workdir: &str) -> Result<(), RciError>`
+///     - Compiles the code in the specified working directory.
+///     - For `Lang::Rust`, it runs `cargo build`.
+///     - For `Lang::Csharp`, it prints a message (implementation needed).
+///
+/// * `test(&self, workdir: &str) -> Result<(), RciError>`
+///     - Tests the code in the specified working directory.
+///     - For `Lang::Rust`, it runs `cargo test`.
+///     - For `Lang::Csharp`, it prints a message (implementation needed).
+///
+/// * `check(&self, workdir: &str) -> Result<(), RciError>`
+///     - Checks the code in the specified working directory.
+///     - For `Lang::Rust`, it runs `cargo check`.
+///     - For `Lang::Csharp`, it prints a message (implementation needed).
+///
+/// # Parameters
+///
+/// * `workdir: &str` - The working directory where the commands should be executed.
+///
+/// # Errors
+///
+/// Returns an `RciError` if the command execution fails.
 impl Lang {
     pub fn compile(&self, workdir: &str) -> Result<(), RciError> {
         match self {

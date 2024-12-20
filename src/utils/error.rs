@@ -1,3 +1,18 @@
+/// `RciError` is an enumeration of possible errors that can occur in the RCI agent.
+///
+/// # Variants
+///
+/// - `TestFailed`: Indicates that a test has failed.
+/// - `BuildFailed`: Indicates that a build has failed.
+/// - `CheckFailed`: Indicates that a check has failed.
+/// - `SysActionFailed(String)`: Indicates that a system action has failed, with a message describing the failure.
+/// - `StdIO(std::io::Error)`: Represents an I/O error.
+/// - `Unimplemented`: Indicates that a feature is unimplemented.
+/// - `AzureStorageError(azure_storage::Error)`: Represents an error from Azure Storage.
+/// - `RequiredData`: Indicates that required data is missing.
+/// - `EnvFileError`: Indicates an error related to environment files.
+/// - `ReqwestError(reqwest::Error)`: Represents an error from the Reqwest HTTP client.
+/// - `MissingInformation(String)`: Indicates that some required information is missing, with a message describing the missing information.
 use std::{error::Error, fmt::Display};
 
 #[derive(Debug)]
